@@ -1,8 +1,8 @@
 # Black Box Testing Report - Assignment 2
 
-**Student Name:** [Your Name]  
-**ASU ID:** [Your ASU ID]  
-**Date:** [Date]
+**Student Name:** Alexander Rafalski 
+**ASU ID:** 1224381808 (arafals1) 
+**Date:** 06/02/2026
 
 ---
 
@@ -35,32 +35,95 @@ Do **not** put everything into one table.
 
 ### Your EP Tables (add as many as needed)
 
+### EP Table 1: Book Validity
+
 | Partition ID | State | Valid/Invalid | Input Condition | Expected Return | Expected Behavior |
 |--------------|-------|---------------|----------------|-----------------|------------------|
-| EP ___ | | | | | |
-
----
+| EP 1.1 | Book is null | Invalid | book == null | 2.1 | Checkout stops immediately |
+| EP 1.2 | Reference book | Invalid | book type is REFERENCE | 5.0 | Book cannot be checked out |
+| EP 1.3 | Available book | Valid | availableCopies > 0 | Success | Checkout may continue |
+| EP 1.4 | Unavailable book | Invalid | availableCopies <= 0 | 2.0 | No checkout occurs |
 
 ## Part 2: Boundary Value Analysis (BVA)
 
 Important BVA cases may overlap with EP. That is OK. You can reference all relevant EP/BVA coverage in Part 3.
 
-### Example BVA Table: Overdue Count (Threshold: 3)
+### EP Table 1: Book Conditions
 
-| Test ID | Boundary | Input Value | Expected Return | Rationale |
-|---------|----------|-------------|-----------------|-----------|
-| BVA 1.1 | Below | overdueCount = 0 | Success (depends on other setup) | Below warning threshold |
-| BVA 1.2 | Warning High | overdueCount = 2 | 1.0 | Just below reject threshold |
-| BVA 1.3 | At | overdueCount = 3 | 4.0 | At rejection boundary |
-| BVA 1.4 | Above | overdueCount = 4 | 4.0 | Above rejection boundary |
+| Partition ID | State | Valid/Invalid | Input Condition | Expected Return | Expected Behavior |
+|--------------|-------|---------------|----------------|-----------------|------------------|
+| EP 1.1 | Book is null | Invalid | book == null | 2.1 | Checkout should not be completed because there are no books available  |
+| EP 1.2 | Reference book | Invalid | Book type is REFERENCE | 5.0 | Reference can't be checked out therefore, the transaction can not be completed |
+| EP 1.3 | Available book | Valid | availableCopies > 0 | Success | Checkout can be processed and will work perfectly fine |
+| EP 1.4 | Unavailable book | Invalid | availableCopies <= 0 | 2.0 | Book can't be checked out because of no copies available |
+
+### EP Table 2: Patron Conditions
+
+| Partition ID | State | Valid/Invalid | Input Condition | Expected Return | Expected Behavior |
+|--------------|-------|---------------|----------------|-----------------|------------------|
+| EP 2.1 | Patron is null | Invalid | patron == null | 3.1 | Checkout should not work because there is no patron available |
+| EP 2.2 | Suspended patron | Invalid | Account is suspended | 3.0 | Patron is not allowed to check out books. |
+| EP 2.3 | Too many overdue books | Invalid | overdueCount >= 3 | 4.0 | Checkout should not work and be denied |
+| EP 2.4 | Unpaid fines | Invalid | fineBalance >= 10.00 | 4.1 | Checkout should not go through until the fines are paid |
+| EP 2.5 | Eligible patron | Valid | Passes all eligibility checks | Continue | Checkout can be processed and onto the next step|
+
+### EP Table 3: Renewal Conditions
+
+| Partition ID | State | Valid/Invalid | Input Condition | Expected Return | Expected Behavior |
+|--------------|-------|---------------|----------------|-----------------|------------------|
+| EP 3.1 | Renewal | Valid | Patron already has the book checked out | 0.1 | Due date should be updated and available copies should not change at all |
+| EP 3.2 | Not a renewal | Valid | Patron does not already have the book | Continue | Checkout continues normally and works |
+
+### EP Table 4: Checkout Limits
+
+| Partition ID | State | Valid/Invalid | Input Condition | Expected Return | Expected Behavior |
+|--------------|-------|---------------|----------------|-----------------|------------------|
+| EP 4.1 | Below limit | Valid | Checkout count is below the maximum | Continue | Patron can check out the book with ease |
+| EP 4.2 | At maximum limit | Invalid | Checkout count equals maximum allowed | 3.2 | Checkout should be declined and reworked |
+| EP 4.3 | Near checkout limit | Valid | Patron is within 2 books of the limit after checkout | 1.1 | Checkout works but gives a warning |
+
+### EP Table 5: Successful Checkout Results
+
+| Partition ID | State | Valid/Invalid | Input Condition | Expected Return | Expected Behavior |
+|--------------|-------|---------------|----------------|-----------------|------------------|
+| EP 5.1 | Normal checkout | Valid | All checks pass and no warnings apply | 0.0 | Book is checked out with no issues |
+| EP 5.2 | Warning for overdue books | Valid | Patron has 1 or 2 overdue books | 1.0 | Checkout works but a warning is showed |
 
 ---
 
 ### Your BVA Tables (add more as needed)
 
+### BVA Table 1: Overdue Books Boundary
+
 | Test ID | Boundary | Input Value | Expected Return | Rationale |
 |---------|----------|-------------|-----------------|-----------|
-| BVA ___ | | | | |
+| BVA 1.1 | Below | overdueCount = 2 | 1.0 | Checkout is allowed with a warning |
+| BVA 1.2 | At | overdueCount = 3 | 4.0 | Checkout should not work and be denied |
+| BVA 1.3 | Above | overdueCount = 4 | 4.0 | Checkout should still not work and be denied |
+
+### BVA Table 2: Fine Boundary
+
+| Test ID | Boundary | Input Value | Expected Return | Rationale |
+|---------|----------|-------------|-----------------|-----------|
+| BVA 2.1 | Below | fineBalance = 9.99 | Success | Fine is below the limit |
+| BVA 2.2 | At | fineBalance = 10.00 | 4.1 | Checkout should not work and be denied |
+| BVA 2.3 | Above | fineBalance = 10.01 | 4.1 | Checkout should still not work and be denied |
+
+### BVA Table 3: Student Checkout Limit Boundary
+
+| Test ID | Boundary | Input Value | Expected Return | Rationale |
+|---------|----------|-------------|-----------------|-----------|
+| BVA 3.1 | Below | checkoutCount = 9 | Success | Student is still below the limit |
+| BVA 3.2 | At | checkoutCount = 10 | 3.2 | Student has reached the limit |
+| BVA 3.3 | Above | checkoutCount = 11 | 3.2 | Student is over the limit |
+
+### BVA Table 4: Warning Boundary
+
+| Test ID | Boundary | Input Value | Expected Return | Rationale |
+|---------|----------|-------------|-----------------|-----------|
+| BVA 4.1 | Below | After checkout count = 7 | 0.0 | It is not close enough to the current trigger limit |
+| BVA 4.2 | At | After checkout count = 8 | 1.1 | Within two books of the limit |
+| BVA 4.3 | Above | After checkout count = 9 | 1.1 | Warning should still be shown |
 
 ---
 
