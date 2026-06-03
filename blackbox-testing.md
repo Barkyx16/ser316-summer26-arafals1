@@ -175,39 +175,67 @@ At least some of your tests should verify observable state changes, not just ret
 ## Part 4: Bug Analysis
 
 ### Easter Eggs Found
+
 List any easter egg messages you observed:
-- 
-- 
+
+* Easter Egg #10.1
+* Easter Egg #10.1/3
+* Easter Egg #10.2
+* Easter Egg #10.2/3
+* Easter Egg #10.3
+* Easter Egg #10.3/3
+* Easter Egg #13
+* Easter Egg #14
+* Easter Egg #15.1
+* Easter Egg #15.2
+* Easter Egg #17
+* Easter Egg #18
+* Easter Egg #19
+* Easter Egg #20
 
 ### Implementation Results
 
 | Implementation | Bugs Found (count) |
-|----------------|---------------------|
-| Checkout0      | |
-| Checkout1      | |
-| Checkout2      | |
-| Checkout3      | |
+| -------------- | ------------------ |
+| Checkout0      | 4                  |
+| Checkout1      | 5                  |
+| Checkout2      | 3                  |
+| Checkout3      | 2                  |
 
 ### Bugs Discovered
-List distinct bugs you identified for each implementation. Each bug must cite at least one test case that revealed it.
 
 **Checkout0:**
-- Bug 1: [Brief description] — Revealed by: [Test ID]
+
+* Bug 1: Available copies are not reduced after a successful checkout. — Revealed by: T11 Normal Checkout
+* Bug 2: Reference books return code 2.0 instead of 5.0. — Revealed by: T10 Reference Book
+* Bug 3: Fine warning checkout does not update availability correctly. — Revealed by: T8 Fine Below Limit
+* Bug 4: Overdue warning checkout does not update availability correctly. — Revealed by: T13 One Overdue Warning
 
 **Checkout1:**
-- Bug 1: [Brief description] — Revealed by: [Test ID]
+
+* Bug 1: Books are not added to the patron's checked out list. — Revealed by: T11 Normal Checkout
+* Bug 2: Student max checkout limit returns 1.1 instead of 3.2. — Revealed by: T15 Student At Max Limit
+* Bug 3: Faculty max checkout limit returns 1.1 instead of 3.2. — Revealed by: T19 Faculty At Max Limit
+* Bug 4: Public max checkout limit returns 1.1 instead of 3.2. — Revealed by: T20 Public At Max Limit
+* Bug 5: Child max checkout limit returns 1.1 instead of 3.2. — Revealed by: T21 Child At Max Limit
 
 **Checkout2:**
-- Bug 1: [Brief description] — Revealed by: [Test ID]
+
+* Bug 1: Unavailable books return 0.0 instead of 2.0. — Revealed by: CheckoutBlackBoxSample T1
+* Bug 2: Renewals return 0.0 instead of 0.1. — Revealed by: T12 Renewal
+* Bug 3: Student max checkout limit returns 1.1 instead of 3.2. — Revealed by: T15 Student At Max Limit
 
 **Checkout3:**
-- Bug 1: [Brief description] — Revealed by: [Test ID]
+
+* Bug 1: Two overdue books returns 0.0 instead of warning code 1.0. — Revealed by: T14 Two Overdue Warning
+* Bug 2: Renewal incorrectly changes available copies. — Revealed by: T12 Renewal
 
 ### Comparative Analysis
-Compare the four implementations:
-- Which bugs are most critical (cause the worst failures)?
-- Which implementation would you use if you had to choose?
-- Why? Justify your choice considering bug severity and frequency.
+
+The most critical bugs were the ones that broke core checkout functionality. Checkout1 was especially problematic because books were not added to the patron's checked out list after a successful checkout. Checkout0 also had serious issues because book availability was not updated correctly and reference books returned the wrong error code.
+
+If I had to choose one implementation, I would use Checkout3. It had the fewest bugs overall and most of the checkout process worked correctly. Its issues were limited to renewal handling and overdue warnings, which are less severe than failing basic checkout operations. Checkout1 and Checkout0 had more frequent problems affecting normal library use, while Checkout2 had several incorrect return codes that could cause confusion for users.
+
 
 ---
 
@@ -215,9 +243,18 @@ Compare the four implementations:
 
 **Which testing technique was most effective for finding bugs?**
 
+Boundary Value Analysis was the most effective technique for finding bugs. Several defects appeared at limit values such as maximum checkout counts, overdue book limits, and fine amounts. Testing those edge cases revealed bugs that would have been missed with only normal inputs.
+
 **What was the most challenging aspect of this assignment?**
+
+The most challenging part was creating test cases that covered all of the requirements while also checking the state of the system after each checkout. It took time to understand the checkout rules and make sure every important scenario was tested.
 
 **How did you decide on your EP and BVA?**
 
+I reviewed the checkout requirements and grouped inputs into valid and invalid categories for Equivalence Partitioning. For Boundary Value Analysis, I focused on values directly at, below, and above important limits such as overdue books, fines, and checkout limits because those are common places where defects occur.
+
 **Describe one test where checking only the return value would NOT have been sufficient to detect a bug.**
+
+T11 Normal Checkout is a good example. The return value indicated that the checkout was successful, but some implementations failed to update the patron's checked out book list or reduce the available copy count. If I had only checked the return value, those defects would not have been detected.
+
 
