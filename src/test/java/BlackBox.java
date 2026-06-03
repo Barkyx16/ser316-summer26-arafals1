@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import java.time.LocalDate;
 
 import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
@@ -280,6 +281,119 @@ public void testReferenceBook(Class<? extends Checkout> checkoutClass) throws Ex
     assertEquals(5.0, result, 0.01);
     assertFalse(patron.hasBookCheckedOut(book.getIsbn()));
     assertEquals(0, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T11 Normal Checkout")
+public void testNormalCheckout(Class<? extends Checkout> checkoutClass) throws Exception {
+
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-1111-1111-1",
+            "Normal Book", "Test Author", Book.BookType.FICTION, 2);
+
+    Patron patron = new Patron("P010", "Normal Patron",
+            "normal@example.com", Patron.PatronType.STUDENT);
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(0.0, result, 0.01);
+    assertTrue(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T12 Renewal")
+public void testRenewal(Class<? extends Checkout> checkoutClass) throws Exception {
+
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-2222-2222-2",
+            "Renewal Book", "Test Author", Book.BookType.FICTION, 2);
+
+    Patron patron = new Patron("P011", "Renewal Patron",
+            "renewal@example.com", Patron.PatronType.STUDENT);
+
+    patron.addCheckedOutBook(book.getIsbn(), LocalDate.now().minusDays(1));
+    int copiesBefore = book.getAvailableCopies();
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(0.1, result, 0.01);
+    assertTrue(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(copiesBefore, book.getAvailableCopies());
+    assertEquals(LocalDate.now().plusDays(patron.getLoanPeriodDays()),
+            patron.getCheckedOutBooks().get(book.getIsbn()));
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T13 One Overdue Warning")
+public void testOneOverdueWarning(Class<? extends Checkout> checkoutClass) throws Exception {
+
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-3333-3333-3",
+            "Warning Book", "Test Author", Book.BookType.FICTION, 2);
+
+    Patron patron = new Patron("P012", "Warning Patron",
+            "warning@example.com", Patron.PatronType.STUDENT);
+
+    patron.setOverdueCount(1);
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(1.0, result, 0.01);
+    assertTrue(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T14 Two Overdue Warning")
+public void testTwoOverdueWarning(Class<? extends Checkout> checkoutClass) throws Exception {
+
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-4444-4444-4",
+            "Warning Book", "Test Author", Book.BookType.FICTION, 2);
+
+    Patron patron = new Patron("P013", "Warning Patron",
+            "warning2@example.com", Patron.PatronType.STUDENT);
+
+    patron.setOverdueCount(2);
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(1.0, result, 0.01);
+    assertTrue(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T15 Student At Max Limit")
+public void testStudentAtMaxLimit(Class<? extends Checkout> checkoutClass) throws Exception {
+
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-5555-5555-5",
+            "Limit Book", "Test Author", Book.BookType.FICTION, 1);
+
+    Patron patron = new Patron("P014", "Limit Patron",
+            "limit@example.com", Patron.PatronType.STUDENT);
+
+    for (int i = 0; i < 10; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(30));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(3.2, result, 0.01);
+    assertFalse(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
 }
 
 
