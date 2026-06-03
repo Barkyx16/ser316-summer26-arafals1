@@ -129,13 +129,9 @@ Important BVA cases may overlap with EP. That is OK. You can reference all relev
 
 ## Part 3: Test Cases Designed
 
-List at least **20** test cases you designed based on your EP/BVA analysis.
+| Test ID Name | EP/BVA | Input Description | Expected Return | Expected State Changes | Checkout0 | Checkout1 | Checkout2 | Checkout3 |
+|--------------|--------|-------------------|-----------------|------------------------|-----------|-----------|-----------|-----------|
 
-Each test case should include:
-- EP/BVA coverage
-- specific inputs / setup
-- expected return code
-- expected **observable state changes** (if any)
 
 > Do not test console output.
 
@@ -146,8 +142,31 @@ At least some of your tests should verify observable state changes, not just ret
 
 | Test ID Name | EP/BVA | Input Description | Expected Return | Expected State Changes | Checkout0 | Checkout1 | Checkout2 | Checkout3 |
 |--------------|--------|-------------------|-----------------|------------------------|-----------|-----------|-----------|-----------|
-| T1 testUnavailableBook | EP 1.1 | Book unavailable (0 copies), eligible patron | 2.0 | No state change | ✓ | ✓ | ✗ | ✓ |
-| T2 testBookAvailable | EP 1.2 | Book available (1+ copies), eligible patron, no warnings normal checkout | 0.0 | Patron map updated; copies of book change | ✗ | ✗ | ✓ | ✓ |
+| Test ID Name                            | EP/BVA                 | Input Description                         | Expected Return | Expected State Changes                                                     | Checkout0 | Checkout1 | Checkout2 | Checkout3 |
+| --------------------------------------- | ---------------------- | ----------------------------------------- | --------------- | -------------------------------------------------------------------------- | 
+| T1 testNullPatron                       | EP 2.1                 | Valid book but no patron                  | 3.1             | Nothing should change                                                      |           |           |           |           |
+| T2 testNullBook                         | EP 1.1                 | No book and eligible patron               | 2.1             | Nothing should change                                                      |           |           |           |           |
+| T3 testSuspendedPatron                  | EP 2.2                 | Suspended patron tries checkout           | 3.0             | Book should not be checked out                                             |           |           |           |           |
+| T4 testThreeOverdueBooks                | EP 2.3, BVA 1.2        | Patron has 3 overdue books                | 4.0             | Nothing should change                                                      |           |           |           |           |
+| T5 testFourOverdueBooks                 | EP 2.3, BVA 1.3        | Patron has 4 overdue books                | 4.0             | Nothing should change                                                      |           |           |           |           |
+| T6 testFineAtLimit                      | EP 2.4, BVA 2.2        | Patron owes exactly $10                   | 4.1             | Nothing should change                                                      |           |           |           |           |
+| T7 testFineAboveLimit                   | EP 2.4, BVA 2.3        | Patron owes more than $10                 | 4.1             | Nothing should change                                                      |           |           |           |           |
+| T8 testFineBelowLimit                   | BVA 2.1                | Patron owes $9.99                         | 0.0             | Book added to patron's checked-out list and available copies decrease by 1 |           |           |           |           |
+| T9 testUnavailableBook                  | EP 1.4                 | Book has no available copies              | 2.0             | Nothing should change                                                      |           |           |           |           |
+| T10 testReferenceBook                   | EP 1.2                 | Reference book checkout attempt           | 5.0             | Nothing should change                                                      |           |           |           |           |
+| T11 testNormalCheckout                  | EP 1.3, EP 2.5, EP 5.1 | Eligible patron checks out available book | 0.0             | Book added to patron's checked-out list and available copies decrease by 1 |           |           |           |           |
+| T12 testRenewal                         | EP 3.1                 | Patron already has the book               | 0.1             | Due date updates but available copies stay the same                        |           |           |           |           |
+| T13 testOneOverdueWarning               | EP 5.2                 | Patron has 1 overdue book                 | 1.0             | Book added to patron's checked-out list and available copies decrease by 1 |           |           |           |           |
+| T14 testTwoOverdueWarning               | EP 5.2, BVA 1.1        | Patron has 2 overdue books                | 1.0             | Book added to patron's checked-out list and available copies decrease by 1 |           |           |           |           |
+| T15 testStudentAtMaxLimit               | EP 4.2, BVA 3.2        | Student already has 10 books              | 3.2             | Nothing should change                                                      |           |           |           |           |
+| T16 testStudentBelowMaxLimit            | EP 4.1, BVA 3.1        | Student has 9 books                       | 1.1             | Book added to patron's checked-out list and available copies decrease by 1 |           |           |           |           |
+| T17 testStudentNearLimitWarning         | EP 4.3, BVA 4.2        | Student has 7 books before checkout       | 1.1             | Book added to patron's checked-out list and checkout count increases       |           |           |           |           |
+| T18 testStudentNoLimitWarning           | BVA 4.1                | Student has 6 books before checkout       | 0.0             | Book added to patron's checked-out list and available copies decrease by 1 |           |           |           |           |
+| T19 testFacultyAtMaxLimit               | EP 4.2                 | Faculty already has 20 books              | 3.2             | Nothing should change                                                      |           |           |           |           |
+| T20 testPublicAtMaxLimit                | EP 4.2                 | Public patron already has 5 books         | 3.2             | Nothing should change                                                      |           |           |           |           |
+| T21 testChildAtMaxLimit                 | EP 4.2                 | Child already has 3 books                 | 3.2             | Nothing should change                                                      |           |           |           |           |
+| T22 testValidationOrderPatronBeforeBook | EP 2.1, EP 1.1         | Patron and book are both null             | 3.1             | Patron check should happen first                                           |                                       
+
 
 (Add rows until you have at least 20.)
 
