@@ -396,6 +396,153 @@ public void testStudentAtMaxLimit(Class<? extends Checkout> checkoutClass) throw
     assertEquals(1, book.getAvailableCopies());
 }
 
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T16 Student Below Max Limit")
+public void testStudentBelowMaxLimit(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
 
+    Book book = new Book("978-1-6666-6666-6",
+            "Limit Book", "Test Author", Book.BookType.FICTION, 1);
+
+    Patron patron = new Patron("P015", "Limit Patron",
+            "limit2@example.com", Patron.PatronType.STUDENT);
+
+    for (int i = 0; i < 9; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(30));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(1.1, result, 0.01);
+    assertTrue(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(0, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T17 Student Near Limit Warning")
+public void testStudentNearLimitWarning(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-7777-7777-7",
+            "Near Limit Book", "Test Author", Book.BookType.FICTION, 1);
+
+    Patron patron = new Patron("P016", "Near Limit Patron",
+            "near@example.com", Patron.PatronType.STUDENT);
+
+    for (int i = 0; i < 7; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(30));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(1.1, result, 0.01);
+    assertEquals(8, patron.getCheckoutCount());
+    assertEquals(0, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T18 Student No Limit Warning")
+public void testStudentNoLimitWarning(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-8888-8888-8",
+            "No Warning Book", "Test Author", Book.BookType.FICTION, 1);
+
+    Patron patron = new Patron("P017", "No Warning Patron",
+            "nowarning@example.com", Patron.PatronType.STUDENT);
+
+    for (int i = 0; i < 6; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(30));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(0.0, result, 0.01);
+    assertEquals(7, patron.getCheckoutCount());
+    assertEquals(0, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T19 Faculty At Max Limit")
+public void testFacultyAtMaxLimit(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-1-9999-9999-9",
+            "Faculty Book", "Test Author", Book.BookType.FICTION, 1);
+
+    Patron patron = new Patron("P018", "Faculty Patron",
+            "faculty@example.com", Patron.PatronType.FACULTY);
+
+    for (int i = 0; i < 20; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(60));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(3.2, result, 0.01);
+    assertFalse(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T20 Public At Max Limit")
+public void testPublicAtMaxLimit(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-2-1111-1111-1",
+            "Public Book", "Test Author", Book.BookType.FICTION, 1);
+
+    Patron patron = new Patron("P019", "Public Patron",
+            "public@example.com", Patron.PatronType.PUBLIC);
+
+    for (int i = 0; i < 5; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(21));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(3.2, result, 0.01);
+    assertFalse(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T21 Child At Max Limit")
+public void testChildAtMaxLimit(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
+
+    Book book = new Book("978-2-2222-2222-2",
+            "Child Book", "Test Author", Book.BookType.CHILDREN, 1);
+
+    Patron patron = new Patron("P020", "Child Patron",
+            "child@example.com", Patron.PatronType.CHILD);
+
+    for (int i = 0; i < 3; i++) {
+        patron.addCheckedOutBook("OLD-" + i, LocalDate.now().plusDays(14));
+    }
+
+    double result = checkout.checkoutBook(book, patron);
+
+    assertEquals(3.2, result, 0.01);
+    assertFalse(patron.hasBookCheckedOut(book.getIsbn()));
+    assertEquals(1, book.getAvailableCopies());
+}
+
+@ParameterizedTest
+@MethodSource("checkoutClassProvider")
+@DisplayName("T22 Patron Checked Before Book")
+public void testValidationOrderPatronBeforeBook(Class<? extends Checkout> checkoutClass) throws Exception {
+    checkout = createCheckout(checkoutClass);
+
+    double result = checkout.checkoutBook(null, null);
+
+    assertEquals(3.1, result, 0.01);
+}
 
 }
