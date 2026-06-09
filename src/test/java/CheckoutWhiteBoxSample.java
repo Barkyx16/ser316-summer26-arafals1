@@ -1,19 +1,8 @@
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Sample White-Box tests for the Checkout system.
- * This class demonstrates how to write white-box tests using:
- * - Control Flow Graph (CFG) analysis
- * - Statement coverage
- * - Branch coverage
- * - Path coverage
- *
- * White-box testing focuses on testing the IMPLEMENTATION by
- * examining the code structure and ensuring all paths are tested.
- */
 public class CheckoutWhiteBoxSample {
 
     private Checkout checkout;
@@ -24,11 +13,44 @@ public class CheckoutWhiteBoxSample {
     }
 
     @Test
-    @DisplayName("WB Test: countBooksByType - null type branch")
-    public void testCountBooksByType_NullType() {
-        // Branch: type == null → TRUE
-        int result = checkout.countBooksByType(null, false);
-        assertEquals(0, result, "Should return 0 for null type");
+    public void testNullType() {
+        assertEquals(0, checkout.countBooksByType(null, false));
     }
 
+    @Test
+    public void testAvailableBookOnly() {
+        Book book = new Book("111", "Test", "Author", Book.BookType.FICTION, 1);
+
+        checkout.addBook(book);
+
+        assertEquals(1, checkout.countBooksByType(Book.BookType.FICTION, true));
+    }
+
+    @Test
+    public void testUnavailableBookOnly() {
+        Book book = new Book("222", "Test", "Author", Book.BookType.FICTION, 1);
+        book.setAvailableCopies(0);
+
+        checkout.addBook(book);
+
+        assertEquals(0, checkout.countBooksByType(Book.BookType.FICTION, true));
+    }
+
+    @Test
+    public void testCountAllBooksOfType() {
+        Book book = new Book("333", "Test", "Author", Book.BookType.FICTION, 1);
+
+        checkout.addBook(book);
+
+        assertEquals(1, checkout.countBooksByType(Book.BookType.FICTION, false));
+    }
+
+    @Test
+    public void testDifferentBookTypeDoesNotCount() {
+        Book book = new Book("444", "Test", "Author", Book.BookType.TEXTBOOK, 1);
+
+        checkout.addBook(book);
+
+        assertEquals(0, checkout.countBooksByType(Book.BookType.FICTION, false));
+    }
 }
