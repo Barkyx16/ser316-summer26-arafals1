@@ -161,9 +161,9 @@ public class Checkout {
         return 0.1;
     }
 
-    if (!book.isAvailable()) {
-        return 2.0;
-    }
+    if (book.getAvailableCopies() <= 0) {
+    return 2.0;
+}
 
     if (patron.getCheckoutCount() >= patron.getMaxCheckoutLimit()) {
         return 3.2;
@@ -173,13 +173,14 @@ public class Checkout {
     book.checkout();
     history.add(new Transaction(patron, book, LocalDate.now(), dueDate));
 
-    if (patron.getOverdueCount() >= 1) {
-        return 1.0;
-    }
+    if (patron.getOverdueCount() >= 1 && patron.getOverdueCount() <= 2) {
+    return 1.0;
+}
 
-    if (patron.getCheckoutCount() >= patron.getMaxCheckoutLimit() - 2) {
-        return 1.1;
-    }
+if (patron.getCheckoutCount() >= patron.getMaxCheckoutLimit() - 2
+        && patron.getCheckoutCount() < patron.getMaxCheckoutLimit()) {
+    return 1.1;
+}
 
     return 0.0;
 }
@@ -282,7 +283,7 @@ public class Checkout {
             return false;
         }
 
-        return typeString == expectedType.toString();
+        return typeString.equals(expectedType.toString());
     }
 
     /**
