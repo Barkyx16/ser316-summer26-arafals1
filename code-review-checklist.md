@@ -25,7 +25,7 @@ Review ALL source files (in main not test) in the project and identify defects u
 | --------- | ------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------- | -------- |
 | 1         | Checkout.java | 254     | FD       | String values are compared using == instead of .equals(). This can cause incorrect results when checking patron types  | High     |
 | 2         | Checkout.java | 12      | CG       | MAX_FINE_AMOUNT should be declared final since it is supposed to be a constant value                                   | Medium   |
-| 3         | Checkout.java | 14      | CS       | Variable name bookList is misleading because the variable is a Map, and not a List                                     | Low      |
+| 3         | Checkout.java | 14      | CS       | The variable bookList is named like a List but is a HashMap, which is confusing and should be renamed                  | Low      |
 | 4         | Checkout.java | 16      | MD       | The comment describing transaction history is vague and does not explain the purpose of the variable                   | Low      |
 | 5         | Checkout.java | 78-160  | CG       | checkoutBook() handles too many responsibilities in one method, making it difficult to read                            | Medium   |
 | 6         | Checkout.java | 170-185 | CS       | Variable name checkoutBookResult is long and does not follow the naming style                                          | Low      |
