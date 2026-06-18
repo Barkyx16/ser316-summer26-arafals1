@@ -26,3 +26,4 @@ I got the number of warnings from 98 in Blackbox to 80 in StaticAnalysis.
 The Spotbugs reported a lot if issues in the file Checkout.Java and the transaction class. I fixed these errors by making copies, returning maps and by ensuring the fields in the Transaction class file were used.
 
 After I made these changes, the report said 0 issues in both of the files.
+
