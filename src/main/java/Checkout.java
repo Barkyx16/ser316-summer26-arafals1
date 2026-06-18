@@ -34,12 +34,16 @@ public class Checkout {
         LocalDate dueDate;
         LocalDate returnDate;
 
-        Transaction(Patron patron, Book book, LocalDate checkoutDate, LocalDate dueDate) {
+                Transaction(Patron patron, Book book, LocalDate checkoutDate, LocalDate dueDate) {
             this.patron = patron;
             this.book = book;
             this.checkoutDate = checkoutDate;
             this.dueDate = dueDate;
             this.returnDate = null;
+        }
+
+        boolean hasDueDate() {
+            return checkoutDate != null && dueDate != null;
         }
     }
    
@@ -414,10 +418,9 @@ if (patron.getCheckoutCount()
     }
 
     public Map<String, Book> getInventory() {
-        return bookList;
-    }
-
+    return new HashMap<>(bookList);
+}
     public Map<String, Patron> getPatrons() {
-        return patrons;
-    }
+    return new HashMap<>(patrons);
+}
 }
